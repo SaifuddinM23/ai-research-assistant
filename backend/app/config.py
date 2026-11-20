@@ -2,8 +2,16 @@ from __future__ import annotations
 """Application configuration loaded from environment variables."""
 
 import os
+import warnings
+import logging
 from pathlib import Path
 from dotenv import load_dotenv
+
+# Suppress telemetry and SSL library warnings
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
+warnings.filterwarnings("ignore")
+logging.getLogger("chromadb").setLevel(logging.ERROR)
+logging.getLogger("urllib3").setLevel(logging.ERROR)
 
 load_dotenv()
 

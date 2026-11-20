@@ -1,6 +1,7 @@
 from __future__ import annotations
 """ChromaDB vector store wrapper."""
 
+import os
 import logging
 import chromadb
 from chromadb.config import Settings as ChromaSettings
@@ -9,6 +10,8 @@ from app.config import CHROMA_DIR
 from app.document_processor import TextChunk
 from app.embedding_service import embed_texts, embed_query
 
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
+logging.getLogger("chromadb.telemetry.product.posthog").disabled = True
 logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = "research_papers"

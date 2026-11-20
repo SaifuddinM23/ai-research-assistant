@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
-"""CLI interface to query the Hybrid RAG Research Assistant directly from terminal."""
+import warnings
+warnings.filterwarnings("ignore")
 
+import os
 import sys
 import asyncio
+import logging
 from pathlib import Path
+
+# Silence ChromaDB internal telemetry errors
+logging.getLogger("chromadb.telemetry.product.posthog").disabled = True
+logging.getLogger("chromadb").setLevel(logging.ERROR)
+logging.getLogger("urllib3").setLevel(logging.ERROR)
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
 
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "backend"))
