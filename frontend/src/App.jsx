@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatWindow from './components/ChatWindow';
 import { getDocuments, uploadDocument, deleteDocument, sendMessage } from './api';
-import { Menu, X, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
@@ -76,10 +76,10 @@ function App() {
       try {
         await uploadDocument(file, (progress) => setUploadProgress(progress));
         await fetchDocuments();
-        addToast(`"${file.name}" indexed successfully into ChromaDB!`, 'success');
+        addToast(`"${file.name}" indexed successfully!`, 'success');
       } catch (err) {
         if (err.response?.status === 409) {
-          addToast('This document has already been indexed.', 'warning');
+          addToast('This document is already indexed in the knowledge base.', 'warning');
         } else {
           addToast(
             err.response?.data?.detail || 'Failed to upload and index document.',
@@ -179,64 +179,48 @@ function App() {
   );
 
   return (
-    <div className="flex h-screen w-screen bg-[#0e0f12] text-gray-100 overflow-hidden">
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed top-3.5 left-3.5 z-50 p-2.5 rounded-xl bg-[#181920] border border-[#27272a] text-gray-300 hover:text-white lg:hidden transition-all shadow-xl cursor-pointer"
-        aria-label="Toggle Sidebar"
-      >
-        {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
-      </button>
-
-      {/* Mobile Backdrop */}
+    <div className="flex h-screen w-screen bg-[#0c0d12] text-zinc-100 overflow-hidden font-sans">
+      {/* Sidebar in normal flex flow */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-30 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <aside className="w-72 shrink-0 h-full border-r border-[#242630] bg-[#121318] flex flex-col z-20">
+          <Sidebar
+            chats={chats}
+            activeChatId={activeChatId}
+            documents={documents}
+            uploadProgress={uploadProgress}
+            onNewChat={handleNewChat}
+            onSelectChat={handleSelectChat}
+            onDeleteChat={handleDeleteChat}
+            onUpload={handleUpload}
+            onDeleteDocument={handleDeleteDocument}
+            onToggleSidebar={() => setSidebarOpen(false)}
+          />
+        </aside>
       )}
 
-      {/* Sidebar - fixed width w-80 */}
-      <div
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-80 shrink-0 transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
-      >
-        <Sidebar
-          chats={chats}
-          activeChatId={activeChatId}
-          documents={documents}
-          uploadProgress={uploadProgress}
-          onNewChat={handleNewChat}
-          onSelectChat={handleSelectChat}
-          onDeleteChat={handleDeleteChat}
-          onUpload={handleUpload}
-          onDeleteDocument={handleDeleteDocument}
-        />
-      </div>
-
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#0e0f12]">
+      <main className="flex-1 flex flex-col min-w-0 h-full bg-[#0c0d12] relative overflow-hidden">
         <ChatWindow
           chat={activeChat}
           isLoading={isLoading}
           onSendMessage={handleSendMessage}
           documentCount={documents.length}
+          sidebarOpen={sidebarOpen}
+          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         />
-      </div>
+      </main>
 
       {/* Toast Notifications */}
-      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2.5">
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
         {toasts.map((toast) => (
           <div
             key={toast.id}
             className={`toast-enter flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-xs font-medium max-w-sm border backdrop-blur-md ${
               toast.type === 'error'
-                ? 'bg-[#2a1314] text-red-200 border-red-800/80'
+                ? 'bg-[#2a1314] text-red-200 border-red-800'
                 : toast.type === 'warning'
-                ? 'bg-[#2a2213] text-amber-200 border-amber-800/80'
-                : 'bg-[#12281a] text-emerald-200 border-emerald-800/80'
+                ? 'bg-[#2a2213] text-amber-200 border-amber-800'
+                : 'bg-[#12281a] text-emerald-200 border-emerald-800'
             }`}
           >
             {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
