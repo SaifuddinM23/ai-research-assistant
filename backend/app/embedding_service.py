@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Embedding service using Sentence Transformers."""
 
 import logging

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Application configuration loaded from environment variables."""
 
 import os

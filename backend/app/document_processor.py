@@ -1,3 +1,4 @@
+from __future__ import annotations
 """PDF document processing – extraction, chunking, metadata."""
 
 import re
@@ -28,6 +29,11 @@ class TextChunk:
 
 # ── Section heading detector ────────────────────────────────
 
+_SECTION_RE = re.compile(
+    r"^(?:SECTION\s+\d+(?:\.\d+)*[:\s].*|CHAPTER\s+\d+.*|MODULE\s+\d+(?:\.\d+)*[:\s].*)",
+    re.IGNORECASE,
+)
+
 _HEADING_RE = re.compile(
     r"^(?:"
     r"(?:Abstract|Introduction|Related Work|Background|Method(?:ology|s)?|"
@@ -50,11 +56,15 @@ def _detect_section(line: str) -> str | None:
     line = line.strip()
     if not line:
         return None
+    if _SECTION_RE.match(line):
+        return line[:100]
     m = _NUMBERED_HEADING_RE.match(line)
     if m:
-        return line
-    if _HEADING_RE.match(line) and len(line) < 120:
-        return line
+        return line[:100]
+    # General heading: must be short (< 60 chars and < 8 words)
+    words = line.split()
+    if len(words) <= 7 and len(line) < 60 and _HEADING_RE.match(line):
+        return line[:100]
     return None
 
 

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Cross-encoder reranker for improving retrieval relevance."""
 
 import logging

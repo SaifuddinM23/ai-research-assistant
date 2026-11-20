@@ -1,3 +1,4 @@
+from __future__ import annotations
 """RAG pipeline – routes questions, retrieves context, generates answers."""
 
 import re
@@ -297,12 +298,14 @@ async def answer_from_external(
 
         # Extractive synthesis if Gemini key not set
         if not answer:
-            top = search_results[0]
-            answer = (
-                f"**{top.get('title', 'External Source')}**\n\n"
-                f"{top.get('snippet', '')}\n\n"
-                f"**Source Link:** [{top.get('title')}]({top.get('link')})"
-            )
+            sections = []
+            sections.append("### External Search Results\n")
+            for item in search_results[:3]:
+                title = item.get('title', 'Source')
+                snippet = item.get('snippet', '').strip()
+                link = item.get('link', '')
+                sections.append(f"**{title}**\n\n{snippet}\n\n**Source:** [{title}]({link})\n")
+            answer = "\n---\n".join(sections)
     else:
         answer = (
             "I could not retrieve external web results for this question. "

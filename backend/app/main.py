@@ -1,3 +1,4 @@
+from __future__ import annotations
 """FastAPI application – main entry point."""
 
 import os

@@ -1,8 +1,8 @@
+from __future__ import annotations
 """Pydantic schemas for request/response validation."""
 
 from pydantic import BaseModel, Field
-from typing import Optional
-from datetime import datetime
+from typing import Optional, Union, List
 
 
 # ── Documents ──────────────────────────────────────────────
@@ -18,7 +18,7 @@ class DocumentMeta(BaseModel):
 
 
 class DocumentListResponse(BaseModel):
-    documents: list[DocumentMeta]
+    documents: List[DocumentMeta]
 
 
 # ── Chat ───────────────────────────────────────────────────
@@ -30,13 +30,13 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=4000)
-    chat_history: list[ChatMessage] = Field(default_factory=list)
-    document_ids: list[str] = Field(default_factory=list)
+    chat_history: List[ChatMessage] = Field(default_factory=list)
+    document_ids: List[str] = Field(default_factory=list)
 
 
 class SourceCitation(BaseModel):
     document: str
-    page: int | str
+    page: Union[int, str]
     section: str
     snippet: str
     score: float = 0.0
@@ -45,7 +45,7 @@ class SourceCitation(BaseModel):
 
 class ChatResponse(BaseModel):
     answer: str
-    citations: list[SourceCitation]
+    citations: List[SourceCitation]
     source_type: str  # "document" | "external" | "mixed"
     query_type: str   # "document" | "external"
 

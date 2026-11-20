@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Hybrid retriever: dense + BM25 with Reciprocal Rank Fusion."""
 
 from app.vector_store import query_vectors

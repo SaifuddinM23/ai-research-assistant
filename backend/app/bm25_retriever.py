@@ -1,3 +1,4 @@
+from __future__ import annotations
 """BM25 sparse retriever."""
 
 import re

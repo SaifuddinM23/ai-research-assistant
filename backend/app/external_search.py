@@ -1,3 +1,4 @@
+from __future__ import annotations
 """External knowledge search using Google Custom Search API with Wikipedia fallback."""
 
 import re
@@ -84,7 +85,14 @@ async def search_wikipedia(query: str, num_results: int = 4) -> list[dict]:
                 except Exception:
                     pass
 
-            full_snippet = intro if intro else snippet
+            # Combine intro and snippet so that factual details (like figures, box office, titles) are never lost
+            if intro and snippet and snippet not in intro:
+                full_snippet = f"{intro}\n\nSearch highlight: {snippet}"
+            elif intro:
+                full_snippet = intro
+            else:
+                full_snippet = snippet
+
             results.append(
                 {
                     "title": title,
