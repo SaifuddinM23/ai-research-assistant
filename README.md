@@ -68,7 +68,7 @@ An intelligent research assistant that accepts machine learning research papers 
 
 ## 🚀 Quick Start
 
-### 1. Clone and configure
+### 1. Configure Environment
 
 ```bash
 cd ai-research-assistant
@@ -76,28 +76,39 @@ cp .env.example .env
 # Edit .env and add your GEMINI_API_KEY
 ```
 
-### 2. Backend setup
+### 2. Streamlit Web UI (Recommended)
+
+To launch the dark-themed interactive Streamlit interface matching the system overview and quick assessment questions:
 
 ```bash
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate    # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r backend/requirements.txt
-
-# Start the backend server
-cd backend
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+source venv/bin/activate
+streamlit run streamlit_app.py --server.port 8501
 ```
 
-The first run will download embedding models (~90MB). The API will be available at `http://localhost:8000`.
+Access the UI at: **`http://localhost:8501`**
 
-### 3. Frontend setup
+### 3. Terminal CLI Querying
+
+For direct terminal execution with formatted answers, citations, and zero warnings:
 
 ```bash
-# In a new terminal
-cd frontend
+# Ask any custom question
+python3 cli_query.py "What learning rate was used in Section 4?"
+
+# Run the complete 5-question assessment test suite
+python3 cli_query.py
+```
+
+### 4. FastAPI Backend & React Frontend (Alternative)
+
+```bash
+# Backend
+cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+# Frontend
+cd frontend && npm run dev
+```
+
 npm install
 npm run dev
 ```
