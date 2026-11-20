@@ -98,7 +98,7 @@ function App() {
     async (docId) => {
       try {
         await deleteDocument(docId);
-        setDocuments((prev) => prev.filter((d) => d.document_id !== docId));
+        setDocuments((prev) => prev.filter((d) => (d.id || d.document_id) !== docId));
         addToast('Document deleted', 'success');
       } catch {
         addToast('Failed to delete document', 'error');
@@ -136,7 +136,7 @@ function App() {
           role: m.role,
           content: m.content,
         }));
-        const documentIds = documents.map((d) => d.document_id);
+        const documentIds = documents.map((d) => d.id || d.document_id);
         const res = await sendMessage(question, chatHistory, documentIds);
 
         const aiMessage = {
