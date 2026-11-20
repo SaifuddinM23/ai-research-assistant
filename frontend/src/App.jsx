@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatWindow from './components/ChatWindow';
 import { getDocuments, uploadDocument, deleteDocument, sendMessage } from './api';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sparkles, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
@@ -10,7 +10,7 @@ function generateId() {
 
 function App() {
   const [chats, setChats] = useState([
-    { id: generateId(), title: 'New Chat', messages: [] },
+    { id: generateId(), title: 'Transformer & RAG Research', messages: [] },
   ]);
   const [activeChatId, setActiveChatId] = useState(chats[0].id);
   const [documents, setDocuments] = useState([]);
@@ -31,7 +31,7 @@ function App() {
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
+    }, 4500);
   }, []);
 
   const fetchDocuments = useCallback(async () => {
@@ -39,12 +39,12 @@ function App() {
       const res = await getDocuments();
       setDocuments(res.data.documents || []);
     } catch {
-      // silent — backend may not be running
+      // Backend may be starting
     }
   }, []);
 
   const handleNewChat = useCallback(() => {
-    const newChat = { id: generateId(), title: 'New Chat', messages: [] };
+    const newChat = { id: generateId(), title: 'New Research Chat', messages: [] };
     setChats((prev) => [newChat, ...prev]);
     setActiveChatId(newChat.id);
   }, []);
@@ -58,7 +58,7 @@ function App() {
       setChats((prev) => {
         const filtered = prev.filter((c) => c.id !== chatId);
         if (filtered.length === 0) {
-          const newChat = { id: generateId(), title: 'New Chat', messages: [] };
+          const newChat = { id: generateId(), title: 'New Research Chat', messages: [] };
           setActiveChatId(newChat.id);
           return [newChat];
         }
@@ -77,13 +77,13 @@ function App() {
       try {
         await uploadDocument(file, (progress) => setUploadProgress(progress));
         await fetchDocuments();
-        addToast('Document uploaded successfully', 'success');
+        addToast(`"${file.name}" indexed successfully into ChromaDB!`, 'success');
       } catch (err) {
         if (err.response?.status === 409) {
-          addToast('This document has already been uploaded', 'warning');
+          addToast('This research paper has already been indexed in ChromaDB.', 'warning');
         } else {
           addToast(
-            err.response?.data?.detail || 'Failed to upload document',
+            err.response?.data?.detail || 'Failed to upload and index document.',
             'error'
           );
         }
@@ -99,7 +99,7 @@ function App() {
       try {
         await deleteDocument(docId);
         setDocuments((prev) => prev.filter((d) => (d.id || d.document_id) !== docId));
-        addToast('Document deleted', 'success');
+        addToast('Document removed from ChromaDB index', 'success');
       } catch {
         addToast('Failed to delete document', 'error');
       }
@@ -114,7 +114,6 @@ function App() {
       const userMessage = { role: 'user', content: question };
       const updatedMessages = [...activeChat.messages, userMessage];
 
-      // Update chat with user message and title
       setChats((prev) =>
         prev.map((c) =>
           c.id === activeChatId
@@ -122,7 +121,7 @@ function App() {
                 ...c,
                 title:
                   c.messages.length === 0
-                    ? question.slice(0, 50) + (question.length > 50 ? '...' : '')
+                    ? question.slice(0, 40) + (question.length > 40 ? '...' : '')
                     : c.title,
                 messages: updatedMessages,
               }
@@ -143,8 +142,8 @@ function App() {
           role: 'assistant',
           content: res.data.answer,
           citations: res.data.citations || [],
-          source_type: res.data.source_type || 'unknown',
-          query_type: res.data.query_type || 'unknown',
+          source_type: res.data.source_type || 'document',
+          query_type: res.data.query_type || 'document',
         };
 
         setChats((prev) =>
@@ -156,14 +155,13 @@ function App() {
         );
       } catch (err) {
         addToast(
-          err.response?.data?.detail || 'Failed to get response. Is the backend running?',
+          err.response?.data?.detail || 'Failed to get response. Please check server.',
           'error'
         );
-        // Add error message to chat
         const errorMessage = {
           role: 'assistant',
           content:
-            '⚠️ Sorry, I encountered an error processing your request. Please check that the backend is running and try again.',
+            '⚠️ An error occurred while retrieving or processing your query. Please check that the backend is active.',
           citations: [],
           source_type: 'error',
         };
@@ -182,19 +180,19 @@ function App() {
   );
 
   return (
-    <div className="flex h-screen bg-gray-950 text-gray-100">
-      {/* Mobile menu button */}
+    <div className="flex h-screen bg-[#090a0f] text-zinc-100 overflow-hidden font-sans">
+      {/* Mobile Toggle Button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 lg:hidden transition-all duration-200"
+        className="fixed top-3 left-4 z-50 p-2 rounded-xl bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white lg:hidden transition-all duration-200 cursor-pointer shadow-lg"
       >
-        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
       </button>
 
-      {/* Sidebar overlay for mobile */}
+      {/* Mobile Backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -218,7 +216,7 @@ function App() {
         />
       </div>
 
-      {/* Main chat area */}
+      {/* Main Chat Area */}
       <main className="flex-1 flex flex-col min-w-0">
         <ChatWindow
           chat={activeChat}
@@ -228,20 +226,23 @@ function App() {
         />
       </main>
 
-      {/* Toast notifications */}
+      {/* Toast Notifications */}
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`toast-enter px-4 py-3 rounded-lg shadow-lg text-sm font-medium max-w-sm ${
+            className={`toast-enter flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-xs font-medium max-w-sm backdrop-blur-md ${
               toast.type === 'error'
-                ? 'bg-red-900/90 text-red-200 border border-red-800'
+                ? 'bg-red-950/90 text-red-200 border border-red-800/80'
                 : toast.type === 'warning'
-                ? 'bg-yellow-900/90 text-yellow-200 border border-yellow-800'
-                : 'bg-emerald-900/90 text-emerald-200 border border-emerald-800'
+                ? 'bg-amber-950/90 text-amber-200 border border-amber-800/80'
+                : 'bg-emerald-950/90 text-emerald-200 border border-emerald-800/80'
             }`}
           >
-            {toast.message}
+            {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
+            {toast.type === 'warning' && <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />}
+            {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />}
+            <span>{toast.message}</span>
           </div>
         ))}
       </div>
