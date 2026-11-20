@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatWindow from './components/ChatWindow';
 import { getDocuments, uploadDocument, deleteDocument, sendMessage } from './api';
-import { Menu, X, Sparkles, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
+import { Menu, X, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
@@ -21,7 +21,6 @@ function App() {
 
   const activeChat = chats.find((c) => c.id === activeChatId) || chats[0];
 
-  // Fetch documents on mount
   useEffect(() => {
     fetchDocuments();
   }, []);
@@ -80,7 +79,7 @@ function App() {
         addToast(`"${file.name}" indexed successfully into ChromaDB!`, 'success');
       } catch (err) {
         if (err.response?.status === 409) {
-          addToast('This research paper has already been indexed in ChromaDB.', 'warning');
+          addToast('This document has already been indexed.', 'warning');
         } else {
           addToast(
             err.response?.data?.detail || 'Failed to upload and index document.',
@@ -99,7 +98,7 @@ function App() {
       try {
         await deleteDocument(docId);
         setDocuments((prev) => prev.filter((d) => (d.id || d.document_id) !== docId));
-        addToast('Document removed from ChromaDB index', 'success');
+        addToast('Document removed from index', 'success');
       } catch {
         addToast('Failed to delete document', 'error');
       }
@@ -121,7 +120,7 @@ function App() {
                 ...c,
                 title:
                   c.messages.length === 0
-                    ? question.slice(0, 40) + (question.length > 40 ? '...' : '')
+                    ? question.slice(0, 36) + (question.length > 36 ? '...' : '')
                     : c.title,
                 messages: updatedMessages,
               }
@@ -180,11 +179,12 @@ function App() {
   );
 
   return (
-    <div className="flex h-screen bg-[#090a0f] text-zinc-100 overflow-hidden font-sans">
-      {/* Mobile Toggle Button */}
+    <div className="flex h-screen w-screen bg-[#0e0f12] text-gray-100 overflow-hidden">
+      {/* Mobile Menu Button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed top-3 left-4 z-50 p-2 rounded-xl bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white lg:hidden transition-all duration-200 cursor-pointer shadow-lg"
+        className="fixed top-3.5 left-3.5 z-50 p-2.5 rounded-xl bg-[#181920] border border-[#27272a] text-gray-300 hover:text-white lg:hidden transition-all shadow-xl cursor-pointer"
+        aria-label="Toggle Sidebar"
       >
         {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
       </button>
@@ -192,14 +192,14 @@ function App() {
       {/* Mobile Backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - fixed width w-80 */}
       <div
-        className={`fixed lg:relative z-40 h-full transition-transform duration-300 ease-in-out ${
+        className={`fixed lg:static inset-y-0 left-0 z-40 w-80 shrink-0 transition-transform duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}
       >
@@ -217,32 +217,32 @@ function App() {
       </div>
 
       {/* Main Chat Area */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#0e0f12]">
         <ChatWindow
           chat={activeChat}
           isLoading={isLoading}
           onSendMessage={handleSendMessage}
           documentCount={documents.length}
         />
-      </main>
+      </div>
 
       {/* Toast Notifications */}
-      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2.5">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`toast-enter flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-xs font-medium max-w-sm backdrop-blur-md ${
+            className={`toast-enter flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-xs font-medium max-w-sm border backdrop-blur-md ${
               toast.type === 'error'
-                ? 'bg-red-950/90 text-red-200 border border-red-800/80'
+                ? 'bg-[#2a1314] text-red-200 border-red-800/80'
                 : toast.type === 'warning'
-                ? 'bg-amber-950/90 text-amber-200 border border-amber-800/80'
-                : 'bg-emerald-950/90 text-emerald-200 border border-emerald-800/80'
+                ? 'bg-[#2a2213] text-amber-200 border-amber-800/80'
+                : 'bg-[#12281a] text-emerald-200 border-emerald-800/80'
             }`}
           >
             {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
             {toast.type === 'warning' && <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />}
             {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />}
-            <span>{toast.message}</span>
+            <span className="leading-snug">{toast.message}</span>
           </div>
         ))}
       </div>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowUp, Sparkles, Command } from 'lucide-react';
+import { ArrowUp, Sparkles } from 'lucide-react';
 
 export default function ChatInput({ onSend, disabled }) {
   const [text, setText] = useState('');
@@ -33,7 +33,7 @@ export default function ChatInput({ onSend, disabled }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative flex flex-col bg-[#111219]/90 backdrop-blur-xl border border-white/10 focus-within:border-indigo-500/60 rounded-2xl shadow-xl shadow-black/40 transition-all duration-200"
+      className="flex flex-col bg-[#181920] border border-[#2e303e] focus-within:border-indigo-500 rounded-2xl shadow-2xl transition-all"
     >
       <textarea
         ref={textareaRef}
@@ -43,32 +43,32 @@ export default function ChatInput({ onSend, disabled }) {
         onKeyDown={handleKeyDown}
         placeholder="Ask anything about research papers, architectures, training hyperparams..."
         disabled={disabled}
-        className="w-full resize-none bg-transparent pt-3.5 pb-2 pl-4 pr-14 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none min-h-[48px] max-h-[180px]"
+        className="w-full resize-none bg-transparent pt-3.5 pb-2 pl-4 pr-12 text-sm text-gray-100 placeholder-gray-500 focus:outline-none min-h-[50px] max-h-[180px] leading-relaxed"
       />
 
-      {/* Bottom Bar inside Input */}
-      <div className="flex items-center justify-between px-3.5 pb-2.5 pt-1 border-t border-white/5">
-        <div className="flex items-center gap-2 text-[10px] text-zinc-400 font-mono">
-          <span className="flex items-center gap-1 text-indigo-400">
-            <Sparkles className="w-3 h-3" />
-            Hybrid Dense + BM25
+      {/* Action / Tag Bar */}
+      <div className="flex items-center justify-between px-4 pb-3 pt-1 border-t border-[#242630]">
+        <div className="flex items-center gap-2 text-[11px] text-gray-400 font-mono">
+          <span className="flex items-center gap-1 text-indigo-400 font-medium">
+            <Sparkles className="w-3.5 h-3.5" />
+            Hybrid RAG Mode
           </span>
           <span>•</span>
-          <span>Cross-Encoder Reranked</span>
+          <span>Dense + BM25 + Cross-Encoder</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-zinc-400 font-mono hidden sm:inline">
-            Press <kbd className="bg-white/10 px-1 py-0.5 rounded text-zinc-400">Enter ↵</kbd>
+          <span className="text-[11px] text-gray-500 font-mono hidden sm:inline">
+            Press <kbd className="bg-[#242630] px-1.5 py-0.5 rounded text-gray-400">Enter ↵</kbd>
           </span>
 
           <button
             type="submit"
             disabled={disabled || !text.trim()}
-            className={`p-2 rounded-xl transition-all duration-200 ${
+            className={`p-2 rounded-xl transition-all cursor-pointer ${
               text.trim() && !disabled
-                ? 'bg-gradient-to-tr from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white cursor-pointer shadow-md shadow-indigo-600/30 ring-1 ring-white/20'
-                : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+                ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30'
+                : 'bg-[#242630] text-gray-600 cursor-not-allowed'
             }`}
           >
             <ArrowUp className="w-4 h-4" />

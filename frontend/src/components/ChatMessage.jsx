@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
-import { User, Sparkles, Globe, FileText, Check, Copy, ExternalLink, Cpu } from 'lucide-react';
+import { User, Sparkles, Globe, FileText, Check, Copy } from 'lucide-react';
 import SourceCitation from './SourceCitation';
 
 export default function ChatMessage({ message }) {
@@ -20,11 +20,11 @@ export default function ChatMessage({ message }) {
   };
 
   return (
-    <div className={`flex gap-3.5 ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex gap-3.5 ${isUser ? 'justify-end' : 'justify-start'} w-full`}>
       {/* Bot Avatar */}
       {!isUser && (
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/20 ring-1 ring-white/10 mt-1">
-          <Sparkles className="w-4 h-4 text-white" />
+        <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0 shadow-md shadow-indigo-600/30 text-white mt-1">
+          <Sparkles className="w-4 h-4" />
         </div>
       )}
 
@@ -33,16 +33,16 @@ export default function ChatMessage({ message }) {
         {!isUser && !isError && (
           <div className="flex items-center gap-2 mb-2">
             {isExternal ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
-                <Globe className="w-3 h-3" /> External Web Knowledge
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 shadow-sm">
+                <Globe className="w-3.5 h-3.5 text-emerald-400" /> External Web Knowledge
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium tracking-wide bg-indigo-500/10 text-indigo-300 border border-indigo-500/25">
-                <FileText className="w-3 h-3" /> Grounded in Research Papers
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-950/80 text-indigo-300 border border-indigo-700/60 shadow-sm">
+                <FileText className="w-3.5 h-3.5 text-indigo-400" /> Grounded in Research Papers
               </span>
             )}
 
-            <span className="text-[10px] text-zinc-400 font-mono hidden sm:inline">
+            <span className="text-[10px] text-gray-500 font-mono hidden sm:inline">
               Dense + BM25 + Cross-Encoder
             </span>
           </div>
@@ -52,10 +52,10 @@ export default function ChatMessage({ message }) {
         <div
           className={`p-4 sm:p-5 rounded-2xl text-sm leading-relaxed relative group ${
             isUser
-              ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-600/20 ring-1 ring-white/10 rounded-tr-xs'
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20 rounded-tr-xs font-normal'
               : isError
-              ? 'bg-red-950/40 text-red-200 border border-red-800/60 rounded-tl-xs'
-              : 'bg-zinc-900/90 text-zinc-100 border border-white/5 shadow-md shadow-black/20 rounded-tl-xs'
+              ? 'bg-red-950/50 text-red-200 border border-red-800 rounded-tl-xs'
+              : 'bg-[#181920] text-gray-100 border border-[#2b2d3a] shadow-lg rounded-tl-xs'
           }`}
         >
           {isUser ? (
@@ -72,7 +72,7 @@ export default function ChatMessage({ message }) {
               {/* Copy Button */}
               <button
                 onClick={handleCopy}
-                className="opacity-0 group-hover:opacity-100 absolute top-3 right-3 p-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 transition-all text-xs flex items-center gap-1"
+                className="opacity-0 group-hover:opacity-100 absolute top-3 right-3 p-1.5 rounded-lg bg-[#242630] hover:bg-[#2e303e] text-gray-400 hover:text-white transition-all text-xs flex items-center gap-1 cursor-pointer"
                 title="Copy response"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -82,14 +82,14 @@ export default function ChatMessage({ message }) {
           )}
         </div>
 
-        {/* Sources & Citations Drawer */}
+        {/* Citations Drawer */}
         {!isUser && message.citations && message.citations.length > 0 && (
           <div className="w-full mt-3.5 space-y-2">
             <div className="flex items-center justify-between px-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
-                Verified Citations ({message.citations.length})
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                Verified Sources ({message.citations.length})
               </span>
-              <span className="text-[10px] text-zinc-400">Click to expand excerpt</span>
+              <span className="text-[11px] text-gray-500">Click to expand excerpt</span>
             </div>
             <div className="grid grid-cols-1 gap-2">
               {message.citations.map((cite, index) => (
@@ -102,8 +102,8 @@ export default function ChatMessage({ message }) {
 
       {/* User Avatar */}
       {isUser && (
-        <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0 border border-white/10 mt-1">
-          <User className="w-4 h-4 text-zinc-300" />
+        <div className="w-8 h-8 rounded-xl bg-[#242630] flex items-center justify-center shrink-0 border border-[#363847] text-gray-300 mt-1">
+          <User className="w-4 h-4" />
         </div>
       )}
     </div>
