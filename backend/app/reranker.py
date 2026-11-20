@@ -15,7 +15,10 @@ def _get_model() -> CrossEncoder:
     global _model
     if _model is None:
         logger.info("Loading cross-encoder model: %s", CROSS_ENCODER_MODEL)
-        _model = CrossEncoder(CROSS_ENCODER_MODEL)
+        try:
+            _model = CrossEncoder(CROSS_ENCODER_MODEL, local_files_only=True)
+        except Exception:
+            _model = CrossEncoder(CROSS_ENCODER_MODEL)
         logger.info("Cross-encoder loaded.")
     return _model
 

@@ -15,7 +15,10 @@ def get_model() -> SentenceTransformer:
     global _model
     if _model is None:
         logger.info("Loading embedding model: %s", EMBEDDING_MODEL)
-        _model = SentenceTransformer(EMBEDDING_MODEL)
+        try:
+            _model = SentenceTransformer(EMBEDDING_MODEL, local_files_only=True)
+        except Exception:
+            _model = SentenceTransformer(EMBEDDING_MODEL)
         logger.info("Embedding model loaded.")
     return _model
 
