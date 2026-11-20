@@ -1,0 +1,21 @@
+# Python
+venv/
+**/__pycache__/
+*.pyc
+.env
+.env.local
+
+# Node
+**/node_modules/
+**/dist/
+
+# Data
+backend/uploads/*.pdf
+backend/chroma_db/
+*.egg-info/
+
+# IDE / OS
+.vscode/
+.idea/
+**/.DS_Store
+.DS_Store
