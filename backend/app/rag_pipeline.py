@@ -64,7 +64,7 @@ CONCISE_PROMPT = """You are a precise AI research assistant. Answer the question
 
 RULES:
 1. Be CONCISE and DIRECT. Do NOT provide lengthy unnecessary paragraphs.
-2. If the context does not contain the answer, reply ONLY with: "The uploaded documents do not contain sufficient information to answer this question."
+2. If the context does not contain the answer or the question asks about external topics, reply ONLY with: "[not found]"
 3. Highlight exact numbers, hyperparameters, and values directly.
 4. Conclude with a citation in the format: [Document: <filename>, Page: <page>, Section: <section>]
 
@@ -79,7 +79,7 @@ CONCISE ANSWER:"""
 def _synthesize_concise_answer(question: str, reranked: list[dict]) -> str:
     """Concise extractor fallback from retrieved chunks."""
     if not reranked:
-        return "The uploaded documents do not contain sufficient information to answer this question."
+        return "[not found]"
 
     top_chunk = reranked[0]
     meta = top_chunk.get("metadata", {})
@@ -152,7 +152,7 @@ async def process_question(
     # 1. Check if documents exist
     if collection_count() == 0:
         return ChatResponse(
-            answer="No documents have been uploaded yet. Please upload a research paper PDF first.",
+            answer="[not found]",
             citations=[],
             source_type="document",
             query_type="document",
@@ -166,7 +166,7 @@ async def process_question(
     # 3. Check if information is present in the document
     if not _is_relevant(question, raw_results):
         return ChatResponse(
-            answer="The uploaded documents do not contain sufficient information to answer this question.",
+            answer="[not found]",
             citations=[],
             source_type="document",
             query_type="document",
@@ -202,6 +202,18 @@ async def process_question(
     answer = _call_gemini(prompt)
     if not answer:
         answer = _synthesize_concise_answer(question, reranked)
+
+    # Normalize not found replies
+    lower_ans = answer.lower()
+    if (
+        "[not found]" in lower_ans
+        or "not found" in lower_ans
+        or "not contain sufficient" in lower_ans
+        or "not mentioned" in lower_ans
+        or "not provide" in lower_ans
+    ):
+        answer = "[not found]"
+        citations = []
 
     return ChatResponse(
         answer=answer,
