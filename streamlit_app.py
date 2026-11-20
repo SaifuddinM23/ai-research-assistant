@@ -292,8 +292,8 @@ if query_to_run:
                 "question": query_to_run,
                 "answer": response.answer,
                 "citations": response.citations,
-                "confidence": response.confidence,
-                "is_grounded": response.is_grounded
+                "source_type": response.source_type,
+                "query_type": response.query_type
             })
         except Exception as e:
             st.error(f"Error executing query: {str(e)}")
@@ -305,12 +305,8 @@ if query_to_run:
 if st.session_state.messages:
     for item in st.session_state.messages:
         with st.container():
-            st.markdown(f"""
-            <div class="qa-card">
-                <div class="question-title">🔍 {item['question']}</div>
-                <div class="answer-body">{item['answer']}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f"#### 🔍 {item['question']}")
+            st.markdown(item["answer"])
 
             if item.get("citations"):
                 with st.expander(f"📚 Verified Document Citations ({len(item['citations'])} sources)", expanded=True):
